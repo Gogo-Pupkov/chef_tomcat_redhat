@@ -75,3 +75,8 @@ end
     action :create
   end
 end
+
+template '/etc/systemd/system/tomcat.service' do
+  source 'tomcat.service.erb'
+end
+
