@@ -47,3 +47,31 @@ bash 'extract_apache_tomcat' do
     EOH
   not_if { ::File.exist?('/opt/tomcat/RELEASE-NOTES') }
 end
+
+directory '/opt/tomcat' do
+  group 'tomcat'
+  recursive true
+  action :create
+end
+
+#directory '/opt/tomcat/test' do
+#  mode '040'
+#  recursive true
+#  action :create
+#end
+#
+bash 'change_persissions' do
+  cwd ::File.dirname('/opt/tomcat')
+  code <<-EOH
+  chmod -R g+r /opt/tomcat/conf
+  chmod g+x /opt/tomcat/conf
+  EOH
+end
+
+%w[ /opt/tomcat/webapps /opt/tomcat/work /opt/tomcat/temp /opt/tomcat/logs ].each do |path|
+  directory path do
+    owner 'tomcat'
+    recursive true
+    action :create
+  end
+end
