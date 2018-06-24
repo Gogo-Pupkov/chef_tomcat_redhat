@@ -4,6 +4,14 @@
 #
 # Copyright:: 2018, The Authors, All Rights Reserved.
 
+package 'epel-release' do
+  action :install
+end
+
+package 'java-1.8.0-openjdk-devel' do
+  action :install
+end
+
 user "tomcat" do
   manage_home false
   home '/etc/tomcat'
@@ -63,9 +71,19 @@ end
 bash 'change_persissions' do
   cwd ::File.dirname('/opt/tomcat')
   code <<-EOH
-  chmod -R g+r /opt/tomcat/conf
-  chmod g+x /opt/tomcat/conf
+  sudo chgrp -R tomcat conf
+  sudo chmod g+rwx conf
+  sudo chmod g+r conf/*
+  sudo chown -R tomcat logs/ temp/ webapps/ work/
+  sudo chgrp -R tomcat bin
+  sudo chgrp -R tomcat lib
+  sudo chmod g+rwx bin
+  sudo chmod g+r bin/*
   EOH
+end
+
+package 'haveged' do
+  action :install
 end
 
 %w[ /opt/tomcat/webapps /opt/tomcat/work /opt/tomcat/temp /opt/tomcat/logs ].each do |path|
@@ -80,3 +98,20 @@ template '/etc/systemd/system/tomcat.service' do
   source 'tomcat.service.erb'
 end
 
+bash 'change_persissions' do
+  code <<-EOH
+  systemctl daemon-reload
+  EOH
+end
+
+bash '' do
+  code <<-EOH
+  sudo firewall-cmd --zone=public --permanent --add-port=8080/tcp
+  sudo firewall-cmd --reload
+  EOH
+end
+
+service 'tomcat' do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :start ]
+end
