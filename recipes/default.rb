@@ -104,7 +104,7 @@ bash 'change_persissions' do
   EOH
 end
 
-bash '' do
+bash 'firewall' do
   code <<-EOH
   sudo firewall-cmd --zone=public --permanent --add-port=8080/tcp
   sudo firewall-cmd --reload
