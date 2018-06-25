@@ -18,7 +18,7 @@ user "tomcat" do
   shell "/bin/nologin"
   comment "Created by Chef"
   system true
-  provider Chef::Provider::User::Useradd
+#  provider Chef::Provider::User::Useradd
   action :create
 end
 
@@ -68,17 +68,17 @@ end
 #  action :create
 #end
 #
+
 bash 'change_persissions' do
-  cwd ::File.dirname('/opt/tomcat')
   code <<-EOH
-  sudo chgrp -R tomcat conf
-  sudo chmod g+rwx conf
-  sudo chmod g+r conf/*
-  sudo chown -R tomcat logs/ temp/ webapps/ work/
-  sudo chgrp -R tomcat bin
-  sudo chgrp -R tomcat lib
-  sudo chmod g+rwx bin
-  sudo chmod g+r bin/*
+    sudo chgrp -R tomcat /opt/tomcat/conf
+    sudo chmod g+rwx /opt/tomcat/conf
+    sudo chmod g+r /opt/tomcat/conf/*
+    sudo chown -R tomcat /opt/tomcat/logs/ /opt/tomcat/temp/ /opt/tomcat/webapps/ /opt/tomcat/work/
+    sudo chgrp -R tomcat /opt/tomcat/bin
+    sudo chgrp -R tomcat /opt/tomcat/lib
+    sudo chmod g+rwx /opt/tomcat/bin
+    sudo chmod g+r /opt/tomcat/bin/*
   EOH
 end
 
